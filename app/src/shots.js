@@ -1,71 +1,55 @@
-// Fixed scenes for screenshots: ?shot=editor shows the app with photos loaded;
-// ?shot=cover shows the exported cover alone, full frame.
-// Query params: layout, grade, title, script, tagline, size, titleFont,
-// ink (0/1), outlines (0/1), halftone (0-100), photos (comma-separated sample
-// files, e.g. woman-car.jpg,man-rooftop.jpg). window.__shotReady is set once
-// the cover has been painted, so a headless screenshot can wait on it.
-const SAMPLE_FILES = ['woman-car.jpg', 'man-rooftop.jpg', 'friends-neon.jpg', 'ocean-drive.jpg'];
+// Fixed scenes for screenshots: ?shot=editor shows the studio with a sample
+// photo loaded; ?shot=cover shows the cover alone, full-bleed in the window.
+// Query knobs: layout, grade, title, script, quote, tagline, badge, photo.
+// window.__shotReady is set once the scene has painted.
+import { state, render, loadSamples } from './main.js';
 
-function wait(ms) { return new Promise((r) => setTimeout(r, ms)); }
+const SAMPLE_FILES = {
+  'woman-car': 'woman-car.jpg',
+  'man-rooftop': 'man-rooftop.jpg',
+  'friends-neon': 'friends-neon.jpg',
+  'ocean-drive': 'ocean-drive.jpg',
+};
 
-export async function runShot(shot, query, api) {
-  const { state, loadImage, render, canvas, syncControls } = api;
-  if (shot === 'cover') document.body.classList.add('shot-cover');
+export async function runShot(shot, query, load) {
+  const pick = (key, fallback) => query.get(key) || fallback;
   if (query.get('layout')) state.layout = query.get('layout');
   if (query.get('grade')) state.grade = query.get('grade');
-  if (query.get('title') !== null) state.title = query.get('title');
-  if (query.get('script') !== null) state.script = query.get('script');
-  if (query.get('tagline') !== null) state.tagline = query.get('tagline');
-  if (query.get('quote') !== null) state.quote = query.get('quote');
   if (query.get('badge')) state.badge = query.get('badge');
-  if (query.get('contrast') !== null) state.contrast = Number(query.get('contrast')) / 100;
-  if (query.get('saturation') !== null) state.saturation = Number(query.get('saturation')) / 100;
-  if (query.get('grain') !== null) state.grain = Number(query.get('grain')) / 100;
-  if (query.get('vignette') !== null) state.vignette = Number(query.get('vignette')) / 100;
+  if (query.get('title')) state.caption.title = query.get('title');
+  if (query.get('script')) state.caption.script = query.get('script');
+  if (query.get('quote')) state.caption.quote = query.get('quote');
+  if (query.get('tagline')) state.caption.tagline = query.get('tagline');
+  if (query.get('font')) state.titleFont = query.get('font');
   if (query.get('size')) state.size = query.get('size');
-  if (query.get('titleFont')) state.titleFont = query.get('titleFont');
-  if (query.get('ink') !== null) state.ink = query.get('ink') !== '0';
-  if (query.get('inkStrength') !== null) state.inkStrength = Number(query.get('inkStrength')) / 100;
-  if (query.get('outlines') !== null) state.outlines = query.get('outlines') !== '0';
-  if (query.get('halftone') !== null) state.halftone = Number(query.get('halftone')) / 100;
-
-  const wanted = (query.get('photos') || SAMPLE_FILES.join(',')).split(',').map((s) => s.trim()).filter(Boolean);
-  const names = {
-    'woman-car.jpg': 'Woman · red convertible', 'man-rooftop.jpg': 'Man · rooftop dusk',
-    'friends-neon.jpg': 'Friends · neon street', 'ocean-drive.jpg': 'Ocean Drive · sunset',
-  };
+  // A single named photo goes first so panel one shows it; the rest follow.
+  const first = SAMPLE_FILES[pick('photo', 'ocean-drive')] || 'ocean-drive.jpg';
   state.photos = [];
-  state.photoNames = [];
-  for (const f of wanted) {
-    try { state.photos.push(await loadImage('samples/' + f)); state.photoNames.push(names[f] || f); }
-    catch { /* skip */ }
-  }
-  api.autoFill(false);
-  if (api.renderThumbs) api.renderThumbs();
-  syncControls();
-  try {
-    await Promise.all([
-      document.fonts.load('90px Anton'), document.fonts.load('40px Pacifico'),
-      document.fonts.load('700 40px "Arial Narrow"'), document.fonts.ready,
-    ]);
-  } catch { /* fall back to system fonts */ }
-  render();
-  // The render runs on the next animation frame and posterizes every panel;
-  // wait for two frames plus a beat so the paint is complete.
-  await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
-  await wait(900);
-  render();
-  await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
-  await wait(400);
-  if (shot === 'editor') {
-    // The right panel scrolls in place: bring EXPORT ALL (and the badge
-    // dropdown + fine sliders above it) into the 720px frame.
-    const right = document.querySelector('.panel.right');
-    const btn = document.getElementById('exportAllBtn');
-    if (right && btn) {
-      const r = right.getBoundingClientRect(), b = btn.getBoundingClientRect();
-      if (b.bottom > r.bottom || b.top < r.top) right.scrollTop += (b.bottom - r.bottom) + 10;
+  try { await load(`samples/${first}`, first); } catch { /* fall through to samples */ }
+  if (state.photos.length === 0) await loadSamples();
+  else {
+    for (const name of ['woman-car.jpg', 'man-rooftop.jpg', 'friends-neon.jpg', 'ocean-drive.jpg']) {
+      if (name === first) continue;
+      try { await load(`samples/${name}`, name); } catch { /* skip */ }
     }
   }
-  window.__shotReady = true;
+  state.slots = [];
+  if (shot === 'cover') {
+    document.body.classList.add('shot-cover');
+    // Size the preview canvas to the window so a headless screenshot is the cover.
+    const c = document.getElementById('preview');
+    const w = window.innerWidth, h = window.innerHeight;
+    const { renderCover } = await import('./cover.js');
+    renderCover(c, state, w, h);
+  } else {
+    document.body.classList.add('shot-editor');
+    render();
+    // Scroll the right panel so FINE TUNE, the badge dropdown and
+    // EXPORT ALL SIZES are all in view beside the preview.
+    const rp = document.querySelector('.panel.right');
+    const ft = document.getElementById('fineTuneH');
+    if (rp && ft) rp.scrollTop = Math.max(0, ft.offsetTop - 8);
+  }
+  await document.fonts.ready.catch(() => {});
+  requestAnimationFrame(() => requestAnimationFrame(() => { window.__shotReady = true; }));
 }
