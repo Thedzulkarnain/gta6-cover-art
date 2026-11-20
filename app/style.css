@@ -1,63 +1,128 @@
-/* VICE PRESS — dark studio UI. The cover itself is drawn on canvas. */
-@font-face { font-family: 'Anton'; src: url('fonts/Anton-Regular.woff2') format('woff2'); font-display: swap; }
-@font-face { font-family: 'Pacifico'; src: url('fonts/Pacifico-Regular.woff2') format('woff2'); font-display: swap; }
+@font-face {
+  font-family: 'Anton';
+  src: url('./fonts/Anton-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Pacifico';
+  src: url('./fonts/Pacifico-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-display: swap;
+}
 
 * { box-sizing: border-box; }
-body { margin: 0; background: #0d0716; color: #f2ecff; font-family: Arial, Helvetica, sans-serif; }
-.top { display: flex; align-items: baseline; gap: 18px; flex-wrap: wrap; padding: 14px 20px; background: linear-gradient(90deg, #ff7e3d, #ff2e88 55%, #7b2ff7); }
-.logo { font-family: Anton, 'Arial Narrow', Impact, sans-serif; font-size: 34px; letter-spacing: 2px; color: #fff; }
-.logo span { color: #ffd34d; }
-.tagline { margin: 0; font-weight: 700; }
-.steps { display: flex; gap: 16px; margin: 0 0 0 auto; padding: 0; list-style: none; font-weight: 700; }
-.steps b { background: #ffd34d; color: #1c0530; border-radius: 50%; display: inline-block; width: 22px; height: 22px; text-align: center; line-height: 22px; margin-right: 6px; }
-.studio { display: grid; grid-template-columns: 260px 1fr 300px; gap: 14px; padding: 14px; align-items: start; }
-.panel { background: #1a1029; border: 1px solid #3a2358; border-radius: 10px; padding: 14px; }
-.panel h2 { font-size: 13px; letter-spacing: 2px; color: #ffd34d; margin: 14px 0 8px; }
-.panel h2:first-child { margin-top: 0; }
-.row { display: flex; flex-wrap: wrap; gap: 8px; }
-.btn { background: #ff2e88; color: #fff; border: 0; border-radius: 8px; padding: 9px 12px; font-weight: 800; cursor: pointer; }
-.btn:hover { background: #ff4d9d; }
-.btn.small { padding: 6px 9px; font-size: 12px; }
-.btn.big { display: block; width: 100%; margin-top: 10px; padding: 13px; font-size: 16px; background: #ffd34d; color: #1c0530; }
-.btn.big.alt { background: #7b2ff7; color: #fff; }
-.drop { border: 2px dashed #7b2ff7; border-radius: 8px; padding: 18px 10px; text-align: center; color: #cbb8f5; margin: 12px 0; }
-.drop.over { background: #2a1544; }
+html, body { margin: 0; padding: 0; }
+body {
+  background: #0d0716;
+  color: #f2ecf7;
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  font-size: 14px;
+}
+
+.studio { max-width: 1560px; margin: 0 auto; padding: 12px 18px 20px; }
+.topbar {
+  display: flex; align-items: center; justify-content: space-between; gap: 16px;
+  padding: 10px 4px 14px; border-bottom: 1px solid #2c1b40; flex-wrap: wrap;
+}
+.brand { display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; }
+.logo {
+  font-family: 'Anton', 'Arial Narrow', Impact, sans-serif;
+  font-size: 34px; letter-spacing: 2px;
+  background: linear-gradient(180deg, #ffe9a8, #ff8a4d 45%, #ff5e7a 75%, #c94bff);
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+.tagline { color: #c9b8d8; font-size: 14px; }
+.steps { display: flex; gap: 18px; list-style: none; margin: 0; padding: 0; color: #c9b8d8; }
+.steps b {
+  display: inline-block; width: 22px; height: 22px; line-height: 22px; text-align: center;
+  border-radius: 50%; background: #ff5e7a; color: #fff; margin-right: 6px; font-size: 12px;
+}
+
+.workbench { display: grid; grid-template-columns: 260px minmax(0, 1fr) 320px; gap: 16px; padding-top: 16px; }
+.panel {
+  background: #1a1026; border: 1px solid #2c1b40; border-radius: 12px;
+  padding: 14px;
+}
+.panel h2 {
+  margin: 4px 0 10px; font-size: 12px; letter-spacing: 2px; text-transform: uppercase;
+  color: #ff9ec4;
+}
+.photos-panel, .controls-panel { align-self: start; }
+.btn-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
+button {
+  background: #2c1b40; color: #f2ecf7; border: 1px solid #4a2d68; border-radius: 8px;
+  padding: 8px 12px; cursor: pointer; font-size: 13px;
+}
+button:hover { background: #3a2360; }
+button.big {
+  flex: 1; background: linear-gradient(180deg, #ff8a4d, #ff5e7a); border: none;
+  font-weight: 700; font-size: 15px; padding: 12px; color: #fff;
+}
+button.big:hover { filter: brightness(1.08); }
+button.active { background: #ff5e7a; border-color: #ff5e7a; color: #fff; }
+.dropzone {
+  border: 2px dashed #4a2d68; border-radius: 10px; padding: 22px 12px; text-align: center;
+  color: #c9b8d8; margin-bottom: 10px;
+}
+.dropzone.over { border-color: #ff5e7a; background: #241430; }
 .thumbs { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-.thumb { width: 100%; aspect-ratio: 3/2; object-fit: cover; border-radius: 6px; cursor: pointer; border: 2px solid transparent; }
-.thumb:hover { border-color: #ff2e88; }
-.muted { color: #a793c9; font-size: 13px; }
-#preview { width: 100%; height: auto; display: block; background: #000; border-radius: 8px; cursor: grab; touch-action: none; }
-.hint { text-align: center; color: #a793c9; margin: 8px 0; }
-.crop-row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
-.crop-row label { flex: 1; min-width: 180px; }
-label { display: block; font-size: 12px; font-weight: 700; letter-spacing: 1px; color: #d9c8ff; margin: 8px 0; }
-label input[type="text"], select { width: 100%; padding: 8px; margin-top: 4px; background: #0d0716; color: #fff; border: 1px solid #3a2358; border-radius: 6px; font-size: 14px; }
-label input[type="range"] { width: 100%; accent-color: #ff2e88; }
-.check { display: flex; gap: 8px; align-items: center; }
-.check input { accent-color: #ff2e88; width: 18px; height: 18px; }
-.grid-picks { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
-.pick { border: 2px solid #3a2358; background: #241640; color: #fff; border-radius: 6px; padding: 8px 6px; cursor: pointer; font-weight: 700; font-size: 12px; }
-.pick.active { border-color: #ffd34d; outline: 2px solid #ffd34d33; }
-.grade-pick { color: #fff; text-shadow: 0 1px 3px #000; min-height: 34px; }
-.foot { text-align: center; color: #a793c9; padding: 10px 0 18px; font-size: 13px; }
-.panel.right { max-height: calc(100vh - 130px); overflow-y: auto; }
-/* Screenshot scene: compact the right panel so fine-tune, badge and
-   EXPORT ALL SIZES fit in one 720px-high view beside the preview. */
-body.shot-editor .top { padding: 8px 16px; }
-body.shot-editor .logo { font-size: 26px; }
-body.shot-editor .studio { padding: 8px; gap: 8px; }
+.thumbs img {
+  width: 100%; aspect-ratio: 4 / 3; object-fit: cover; border-radius: 8px; cursor: pointer;
+  border: 2px solid transparent; display: block;
+}
+.thumbs img.first { border-color: #ffd166; }
+.hint { color: #9d8bb0; font-size: 12px; margin: 8px 0; }
+
+.preview-panel { text-align: center; }
+.preview-wrap {
+  background: #160a24; border: 1px solid #2c1b40; border-radius: 12px; padding: 10px;
+}
+#preview { width: 100%; max-width: 760px; height: auto; display: block; margin: 0 auto; border-radius: 6px; cursor: grab; }
+#preview:active { cursor: grabbing; }
+.crop-row { display: flex; gap: 12px; align-items: center; justify-content: center; margin-top: 10px; flex-wrap: wrap; }
+#status { color: #8fe3b0; min-height: 18px; }
+
+.layout-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 6px; }
+.layout-grid button { padding: 8px 4px; font-size: 11px; }
+.grade-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin-bottom: 6px; }
+.grade-grid button { padding: 8px 2px; font-size: 11px; }
+.check { display: flex; gap: 8px; align-items: center; margin: 8px 0; }
+.slider { display: block; margin: 8px 0; color: #c9b8d8; font-size: 12px; }
+.slider input, .field input, .field select { width: 100%; margin-top: 4px; }
+.field { display: block; margin: 8px 0; color: #c9b8d8; font-size: 12px; }
+.field input, .field select {
+  background: #241430; color: #f2ecf7; border: 1px solid #4a2d68; border-radius: 6px;
+  padding: 7px 9px; font-size: 13px;
+}
+.size-row { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px; }
+.size-row button { padding: 7px 9px; font-size: 12px; }
+.export-row { display: flex; gap: 8px; margin: 12px 0 8px; }
+.foot { text-align: center; color: #9d8bb0; font-size: 12px; padding: 14px 0 4px; }
+
+/* Screenshot scenes: cover alone fills the window, editor shows the full UI. */
+body.shot-cover { background: #160a24; }
+body.shot-cover .studio { max-width: none; padding: 0; }
+body.shot-cover .topbar, body.shot-cover .photos-panel, body.shot-cover .controls-panel,
+body.shot-cover .foot, body.shot-cover .preview-panel .hint, body.shot-cover .crop-row,
+body.shot-cover #status { display: none; }
+body.shot-cover .workbench { display: block; padding: 0; }
+body.shot-cover .preview-panel { padding: 0; }
+body.shot-cover .preview-wrap { border: none; border-radius: 0; padding: 0; background: #160a24; }
+body.shot-cover #preview { max-width: none; width: 100vw; height: 100vh; object-fit: contain; border-radius: 0; }
+
+/* Editor screenshot scene: shrink the whole studio so every control — fine-tune
+   sliders, badge dropdown and Export All Sizes — fits in a 1280 x 720 frame. */
+body.shot-editor .studio { zoom: 0.54; }
+body.shot-editor .foot, body.shot-editor #status { display: none; }
+body.shot-editor .crop-row, body.shot-editor .preview-panel > .hint { display: none; }
+body.shot-editor .topbar { padding: 4px 4px 6px; }
+body.shot-editor .workbench { padding-top: 8px; gap: 10px; }
 body.shot-editor .panel { padding: 9px; }
-body.shot-editor .panel h2 { margin: 8px 0 5px; font-size: 11px; }
-body.shot-editor label { margin: 4px 0; }
-body.shot-editor label input[type="text"], body.shot-editor select { padding: 5px; margin-top: 2px; }
-body.shot-editor .grid-picks { grid-template-columns: repeat(4, 1fr); }
-body.shot-editor .pick { padding: 5px 3px; font-size: 11px; }
-body.shot-editor .btn.big { padding: 9px; margin-top: 6px; font-size: 14px; }
-body.shot-editor .drop { padding: 10px 8px; margin: 8px 0; }
-/* Screenshot scenes: the cover fills the window, the studio hides. */
-body.shot-cover { background: #000; }
-body.shot-cover .top, body.shot-cover .panel.left, body.shot-cover .panel.right, body.shot-cover .foot, body.shot-cover .hint, body.shot-cover .crop-row { display: none; }
-body.shot-cover .studio { display: block; padding: 0; }
-body.shot-cover .panel.center { background: #000; border: 0; border-radius: 0; padding: 0; }
-body.shot-cover #preview { border-radius: 0; width: 100vw; height: 100vh; object-fit: fill; }
-@media (max-width: 1000px) { .studio { grid-template-columns: 1fr; } }
+body.shot-editor .panel h2 { margin: 2px 0 6px; }
+body.shot-editor .slider, body.shot-editor .field { margin: 4px 0; }
+body.shot-editor .check { margin: 4px 0; }
+
+@media (max-width: 1080px) {
+  .workbench { grid-template-columns: 1fr; }
+}
